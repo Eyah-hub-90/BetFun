@@ -102,16 +102,52 @@ export const global = async (param: GlobalSettingType) => {
   }
 };
 
-export const withdraw = async (params: WithdrawType) => {
-  const withdrawInstruction = await program.methods.withdraw(new BN(10000)).accounts({
-    user: params.signer,
-    reciever: params.reciever, 
-    global: globalPDA,
-    market: params.market_id,
-  }).instruction();
+export const withdrawWinnings = async (
+  userWallet: PublicKey,
+  marketId: string,
+  winningTokenMint: PublicKey,
+  userTokenAccount: PublicKey
+) => {
+  try {
+    console.log("💰 Withdrawing winnings");
+    console.log("💰 User:", userWallet.toBase58());
+    console.log("💰 Market ID:", marketId);
+    console.log("💰 Winning token mint:", winningTokenMint.toBase58());
 
-  return withdrawInstruction
-}
+    // Create the withdraw instruction
+    const withdrawInstruction = await program.methods
+      .withdraw({ marketId })
+      .accounts({
+        user: userWallet,
+        market: new PublicKey(marketId),
+        global: globalPDA,
+        winningTokenMint: winningTokenMint,
+        userTokenAccount: userTokenAccount,
+        tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    // Create and send transaction
+    const latestBlockHash = await provider.connection.getLatestBlockhash(
+      provider.connection.commitment
+    );
+
+    const messageV0 = new TransactionMessage({
+      payerKey: userWallet,
+      recentBlockhash: latestBlockHash.blockhash,
+      instructions: [withdrawInstruction],
+    }).compileToV0Message();
+
+    const vtx = new VersionedTransaction(messageV0);
+
+    // Transaction needs to be signed by the user's wallet on frontend
+    return vtx;
+  } catch (error) {
+    console.error("❌ Error creating withdrawal transaction:", error);
+    throw error;
+  }
+};
 
 export const claimFee = async (address: String, amount: number) =>{
   try {

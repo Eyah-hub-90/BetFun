@@ -316,4 +316,53 @@ export const adminResolve = async (req: Request, res: Response) => {
     }
 };
 
+export const getWinningInfo = async (req: Request, res: Response) => {
+    try {
+        const { market_id, user_wallet } = req.query;
+
+        if (!market_id || !user_wallet) {
+            return res.status(400).json({
+                error: "Missing parameters",
+                message: "market_id and user_wallet are required"
+            });
+        }
+
+        // Get market data from database
+        const market = await MarketModel.findById(market_id);
+
+        if (!market) {
+            return res.status(404).json({
+                error: "Market not found"
+            });
+        }
+
+        if (market.marketStatus !== "RESOLVED") {
+            return res.status(400).json({
+                error: "Market not resolved",
+                message: "This market hasn't been resolved yet"
+            });
+        }
+
+        // Import SDK to check on-chain data
+        const sdk = await import('../../prediction_market_sdk');
+
+        // Determine winning side
+        // Note: You'll need to add logic here to determine if user is a winner
+        // based on the on-chain market result
+
+        res.status(200).json({
+            market_id: market._id,
+            marketStatus: market.marketStatus,
+            question: market.question,
+            // Add more winning info as needed
+        });
+    } catch (error) {
+        console.error("😒 get winning info error:", error);
+        res.status(500).json({
+            error: "Failed to get winning information",
+            message: error instanceof Error ? error.message : "Unknown error"
+        });
+    }
+};
+
 export const recentActivity = async (req:Request, res: Response) => {}

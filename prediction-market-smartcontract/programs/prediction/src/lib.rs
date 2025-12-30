@@ -8,7 +8,7 @@ pub mod utils;
 
 use instructions::{
     admin_resolve::*, betting::*, create_market::*, deposite_liquidity::*, get_oracle_res::*,
-    init::*, token_mint::*,
+    init::*, token_mint::*, withdraw::*,
 };
 use states::{
     global::GlobalParams,
@@ -47,6 +47,10 @@ pub mod prediction {
 
     pub fn resolve_market(ctx: Context<AdminResolve>, params: AdminResolveParams) -> Result<()> {
         admin_resolve(ctx, params)
+    }
+
+    pub fn withdraw(ctx: Context<Withdraw>, params: WithdrawParams) -> Result<()> {
+        Withdraw::withdraw(ctx, params)
     }
 
 }

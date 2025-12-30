@@ -29,4 +29,14 @@ pub enum ContractError {
     InvalidAdmin,
     #[msg("Betting deadline exceeded - bets must be placed at least 48 hours before resolution")]
     BettingDeadlineExceeded,
+    #[msg("Market not resolved yet")]
+    MarketNotResolved,
+    #[msg("Not the winning token")]
+    NotWinningToken,
+    #[msg("No winning tokens to claim")]
+    NoWinningTokens,
+    #[msg("Insufficient funds for withdrawal")]
+    InsufficientFunds,
+    #[msg("Invalid token account")]
+    InvalidTokenAccount,
 }

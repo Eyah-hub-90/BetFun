@@ -12,5 +12,6 @@ router.post("/betting", market.betting);
 router.post("/liquidity", market.addLiquidity);
 router.post("/resolve", market.adminResolve);
 router.get("/get", market.getMarketData);
+router.get("/winning-info", market.getWinningInfo);
 
 export default router;

@@ -51,3 +51,11 @@ pub struct AdminResolutionEvent {
     pub admin: Pubkey,
     pub outcome: bool,
 }
+
+#[event]
+pub struct WithdrawEvent {
+    pub market: Pubkey,
+    pub user: Pubkey,
+    pub amount: u64,
+    pub token_balance: u64,
+}

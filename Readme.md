@@ -104,6 +104,83 @@ BetFun uses an **admin-only manual resolution system** instead of oracle-based r
 
 ---
 
+## 💰 Claiming Winnings
+
+After a market is resolved, winners can claim their share of the prize pool based on their winning token holdings.
+
+### How Claiming Works
+
+1. **Market Resolution** – Admin must first resolve the market as YES or NO
+2. **Winner Determination** – If you bet on the winning side, you hold winning tokens
+3. **Proportional Payout** – Your payout = (Your Tokens / Total Winning Tokens) × Total Prize Pool
+4. **Claim Transaction** – Submit on-chain transaction to withdraw your SOL
+
+### Using the Claim Page
+
+1. **Navigate** to `/claim` on the frontend
+2. **Connect** your wallet that holds winning tokens
+3. **View** all resolved markets
+4. **Click** "Claim Winnings" on markets you participated in
+5. **Sign** the transaction to receive your SOL payout
+
+### Claim Process Example
+
+```
+Market: "Will BTC reach $100k by Dec 2025?"
+Resolution: YES wins
+Total Prize Pool: 10 SOL
+Total YES tokens: 1,000
+Your YES tokens: 100
+
+Your Payout = (100 / 1,000) × 10 SOL = 1 SOL
+```
+
+### Technical Details
+
+**Smart Contract**: The `withdraw` instruction:
+- Verifies market is resolved
+- Checks user has winning tokens (YES or NO based on outcome)
+- Calculates proportional share of prize pool
+- Transfers SOL from market account to user
+- Reserves rent-exempt minimum in market account
+
+**Token Requirements**:
+- You must hold winning tokens in your wallet
+- Tokens are NOT burned during withdrawal
+- You can only withdraw once per market
+- Must have winning side tokens (YES if YES won, NO if NO won)
+
+### API Endpoint
+
+**GET** `/api/market/winning-info`
+
+**Query Parameters:**
+- `market_id`: MongoDB market ID
+- `user_wallet`: User's wallet address
+
+**Response:**
+```json
+{
+  "market_id": "...",
+  "marketStatus": "RESOLVED",
+  "question": "Market question",
+  "winning_side": "YES",
+  "user_tokens": 100,
+  "total_winning_tokens": 1000,
+  "estimated_payout": 1000000000
+}
+```
+
+### Important Notes
+
+- ⏰ **Claim Anytime** - No time limit on claims after resolution
+- 💸 **Gas Fees** - You pay Solana transaction fees to claim
+- 🎯 **One Claim** - Currently one withdrawal per market
+- 🔒 **Losers Cannot Claim** - Only winning side can withdraw
+- 💰 **Rent Reserve** - Small amount kept in market account for rent
+
+---
+
 ## How it works
 
 You can reference the guide video here:
