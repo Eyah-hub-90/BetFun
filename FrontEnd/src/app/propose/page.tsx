@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import { ProposeType } from "@/types/type";
 import axios from "axios";
-import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
+import { useAnchorWallet, useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { marketField } from "@/data/data";
-import { elipsKey, findJsonPathsForKey, isPublickey, uploadToPinata } from "@/utils";
+import { elipsKey, findJsonPathsForKey, isPublickey, uploadToPinata, checkTokenBalance, TOKEN_GATE_CONFIG } from "@/utils";
 import { createMarket } from "@/components/prediction_market_sdk";
 import { customizeFeed } from "@/components/oracle_service/simulateFeed";
 import { errorAlert, infoAlert, warningAlert } from "@/components/elements/ToastGroup";
@@ -50,6 +50,7 @@ export default function Propose() {
   const [active, setActive] = useState(true);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const wallet = useWallet()
+  const { connection } = useConnection();
   const [isChecked, setIsChecked] = useState(false);
   const [marketFieldIndex, setMarketFieldIndex] = useState(0);
   const [marketFieldContentIndex, setMarketFieldContentIndex] = useState(0);
@@ -60,6 +61,19 @@ export default function Propose() {
   const [isUploading, setUploading] = useState(false);
   const router = useRouter()
   const anchorWallet = useAnchorWallet();
+
+  // Token gate state
+  const [tokenGateStatus, setTokenGateStatus] = useState<{
+    hasAccess: boolean;
+    balance: number;
+    required: number;
+    isChecking: boolean;
+  }>({
+    hasAccess: false,
+    balance: 0,
+    required: TOKEN_GATE_CONFIG.minimumBalance,
+    isChecking: true,
+  });
 
   // Add new state for sports selection
   const [selectedSport, setSelectedSport] = useState("");
@@ -155,6 +169,41 @@ export default function Propose() {
     }
     fetchTokens();
   }, []);
+
+  // Check token balance when wallet connects
+  useEffect(() => {
+    async function checkGateAccess() {
+      if (!wallet.publicKey || !connection) {
+        setTokenGateStatus({
+          hasAccess: false,
+          balance: 0,
+          required: TOKEN_GATE_CONFIG.minimumBalance,
+          isChecking: false,
+        });
+        return;
+      }
+
+      setTokenGateStatus(prev => ({ ...prev, isChecking: true }));
+
+      const result = await checkTokenBalance(
+        wallet.publicKey.toBase58(),
+        connection
+      );
+
+      setTokenGateStatus({
+        ...result,
+        isChecking: false,
+      });
+
+      if (!result.hasAccess && TOKEN_GATE_CONFIG.enabled) {
+        warningAlert(
+          `You need ${result.required.toLocaleString()} tokens to create markets. Your balance: ${result.balance.toLocaleString()}`
+        );
+      }
+    }
+
+    checkGateAccess();
+  }, [wallet.publicKey, connection]);
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -273,6 +322,14 @@ export default function Propose() {
       if (!wallet || !wallet.publicKey || !anchorWallet) {
         warningAlert("Please connect wallet!");
         return
+      }
+
+      // Check token gate before proceeding
+      if (TOKEN_GATE_CONFIG.enabled && !tokenGateStatus.hasAccess) {
+        errorAlert(
+          `Insufficient token balance! You need ${tokenGateStatus.required.toLocaleString()} tokens to create markets. Your balance: ${tokenGateStatus.balance.toLocaleString()}`
+        );
+        return;
       }
 
       setActive(false);
@@ -406,6 +463,43 @@ export default function Propose() {
             Fill in the blanks to create your market!
           </div>
         </div>
+
+        {/* Token Gate Status Banner */}
+        {TOKEN_GATE_CONFIG.enabled && wallet.publicKey && (
+          <div className={`self-stretch p-4 rounded-2xl border ${
+            tokenGateStatus.isChecking
+              ? "bg-[#2a2a2a] border-[#3a3a3a]"
+              : tokenGateStatus.hasAccess
+              ? "bg-gradient-to-r from-[#07b3ff]/10 to-[#0595d3]/10 border-[#07b3ff]/30"
+              : "bg-gradient-to-r from-[#ff6464]/10 to-[#ff4444]/10 border-[#ff6464]/30"
+          } flex items-center justify-between transition-all duration-300`}>
+            <div className="flex flex-col gap-1">
+              <div className={`text-lg font-semibold ${
+                tokenGateStatus.isChecking
+                  ? "text-[#838587]"
+                  : tokenGateStatus.hasAccess
+                  ? "text-[#07b3ff]"
+                  : "text-[#ff6464]"
+              }`}>
+                {tokenGateStatus.isChecking
+                  ? "Checking token balance..."
+                  : tokenGateStatus.hasAccess
+                  ? "✓ Token requirement met"
+                  : "⚠ Insufficient token balance"}
+              </div>
+              <div className="text-[#838587] text-sm">
+                {tokenGateStatus.isChecking
+                  ? "Please wait..."
+                  : `Your balance: ${tokenGateStatus.balance.toLocaleString()} / ${tokenGateStatus.required.toLocaleString()} tokens required`}
+              </div>
+            </div>
+            {!tokenGateStatus.isChecking && !tokenGateStatus.hasAccess && (
+              <div className="text-[#ff6464] text-sm font-medium bg-[#1a1a1a] px-4 py-2 rounded-lg">
+                Need {(tokenGateStatus.required - tokenGateStatus.balance).toLocaleString()} more tokens
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Main Form Section */}
         <div className="self-stretch flex flex-col gap-8">
@@ -951,10 +1045,17 @@ export default function Propose() {
 
               {/* Submit Button */}
               <button
-                className="w-full px-6 py-4 text-xl font-medium text-[#111111] bg-[#07b3ff] rounded-2xl shadow-[inset_0px_3px_0px_0px_rgba(255,255,255,0.16)] hover:bg-[#0697e5] transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98]"
+                className={`w-full px-6 py-4 text-xl font-medium rounded-2xl shadow-[inset_0px_3px_0px_0px_rgba(255,255,255,0.16)] transition-all duration-200 ease-in-out transform ${
+                  TOKEN_GATE_CONFIG.enabled && !tokenGateStatus.hasAccess
+                    ? "bg-[#3a3a3a] text-[#838587] cursor-not-allowed opacity-50"
+                    : "bg-[#07b3ff] text-[#111111] hover:bg-[#0697e5] hover:scale-[1.02] active:scale-[0.98]"
+                }`}
                 onClick={onSubmit}
+                disabled={TOKEN_GATE_CONFIG.enabled && !tokenGateStatus.hasAccess}
               >
-                Create Market
+                {TOKEN_GATE_CONFIG.enabled && !tokenGateStatus.hasAccess
+                  ? "Insufficient Tokens to Create Market"
+                  : "Create Market"}
               </button>
             </div>
           </div>

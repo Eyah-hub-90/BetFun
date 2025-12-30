@@ -38,7 +38,7 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
               href="/"
               className="text-xl leading-9 font-normal font-['anton'] text-white uppercase"
             >
-              speculape
+              betfun
             </Link>
           </div>
         </div>

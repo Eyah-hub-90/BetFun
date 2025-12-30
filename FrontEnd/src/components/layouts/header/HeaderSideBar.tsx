@@ -36,7 +36,7 @@ const HeaderSideBar = ({ isCollapsed, setIsCollapsed, isCancel, setIsCanceled }:
               href="/"
               className="text-4xl leading-9 font-normal font-['anton'] text-white uppercase"
             >
-              speculape
+              betfun
             </Link>
           )}
         </div>
@@ -57,7 +57,7 @@ const HeaderSideBar = ({ isCollapsed, setIsCollapsed, isCancel, setIsCanceled }:
             href="/"
             className="text-xl leading-9 font-normal font-['anton'] text-white uppercase"
           >
-            speculape
+            betfun
           </Link>
         </div>
         <div className="px-3 py-1.5 bg-[#282828] rounded-xl shadow-[inset_0px_2px_0px_0px_rgba(53,53,53,1.00)] flex justify-start items-center gap-1">

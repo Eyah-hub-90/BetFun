@@ -1,6 +1,6 @@
-# Prediction Market Backend
+# BetFun Backend
 
-This is the backend service for a prediction market application. It is built using Node.js, TypeScript, Express, and MongoDB. The backend interacts with the Solana blockchain to manage prediction markets, handle liquidity, and process bets.
+This is the backend service for BetFun - A Decentralized Prediction Market. It is built using Node.js, TypeScript, Express, and MongoDB. The backend interacts with the Solana blockchain to manage prediction markets, handle liquidity, and process bets.
 
 ## Features
 

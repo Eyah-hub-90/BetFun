@@ -1,4 +1,4 @@
-use crate::constants::GLOBAL_SEED;
+use crate::constants::{GLOBAL_SEED, BETTING_DEADLINE_SECONDS};
 use crate::errors::ContractError;
 use crate::states::{global::*, market::*};
 use anchor_lang::{prelude::*, solana_program};
@@ -65,6 +65,15 @@ pub struct Betting<'info> {
 impl Betting<'_> {
     pub fn betting(ctx: Context<Betting>, params: BettingParams) -> Result<()> {
         let market = &mut ctx.accounts.market;
+
+        // Check betting deadline - must be at least 48 hours before resolution
+        let current_time = Clock::get()?.unix_timestamp;
+        let betting_deadline = market.resolution_date - BETTING_DEADLINE_SECONDS;
+
+        require!(
+            current_time <= betting_deadline,
+            ContractError::BettingDeadlineExceeded
+        );
 
         let decimal_multiplier = 10u64.pow(ctx.accounts.global.decimal as u32);
         

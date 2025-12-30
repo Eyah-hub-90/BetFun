@@ -1,8 +1,8 @@
-#  DecentraPredict - A Decentralized Prediction Market
+#  BetFun - A Decentralized Prediction Market
 
 **A fully decentralized prediction market platform on Solana enabling users to create custom markets, add liquidity, place token-based bets, and automatically resolve outcomes using Switchboard oracles and Anchor smart contracts.**
 
-DecentraPredict is an open-source decentralized prediction market built on Solana, allowing users to create, participate, add liquidity, and resolve prediction events using smart contracts.
+BetFun is an open-source decentralized prediction market built on Solana, allowing users to create, participate, add liquidity, and resolve prediction events using smart contracts.
 
 >  Bet on real-world outcomes. Earn if you're right. Built for transparency, fairness, and community governance.
 
@@ -11,6 +11,7 @@ DecentraPredict is an open-source decentralized prediction market built on Solan
 ## Features
 
 - **Create Custom Markets** – Users can create prediction markets with custom questions and outcomes
+- **Token-Gated Market Creation** – Only users with sufficient BetFun tokens can create markets (500,000 tokens required)
 - **Add Liquidity** – Fund markets to increase liquidity and enable betting
 - **Token-Based Betting** – Place bets on "Yes" or "No" outcomes using dynamic token pricing
 - **Decentralized Smart Contracts** – Trustless and transparent market resolution on Solana
@@ -18,6 +19,32 @@ DecentraPredict is an open-source decentralized prediction market built on Solan
 - **Referral System** – Earn rewards through referral links
 - **User Profiles** – Track your betting history and market participation
 - **Real-time Market Data** – View active, pending, and resolved markets
+
+---
+
+## 🔐 Token-Gated Market Creation
+
+BetFun implements token gating to ensure quality market creation and prevent spam. To create prediction markets, users must hold a minimum of **500,000 BetFun tokens** in their wallet.
+
+### How Token Gating Works
+
+1. **Backend Validation** – When a user attempts to create a market, the backend verifies their SPL token balance via the Solana blockchain
+2. **Frontend Checks** – The UI automatically checks the user's token balance and displays their eligibility status
+3. **Real-time Feedback** – Users see their current balance and how many more tokens they need (if any)
+4. **Disabled Submission** – The "Create Market" button is disabled if the user doesn't meet the minimum requirement
+
+### Configuration
+
+Token gating can be configured in:
+- **Backend**: `BetFun/BackEnd/src/config.ts` - Set `tokenGateConfig`
+- **Frontend**: `BetFun/FrontEnd/src/utils/index.ts` - Set `TOKEN_GATE_CONFIG`
+
+To disable token gating for testing, set `enabled: false` in both configurations.
+
+### Required Environment Variables
+
+- `GATE_TOKEN_MINT` (Backend) - The SPL token mint address
+- `NEXT_PUBLIC_GATE_TOKEN_MINT` (Frontend) - Same token mint address for client-side checks
 
 ---
 
@@ -126,6 +153,8 @@ PORT=9000
 DB_URL=your_mongodb_connection_string
 PASSKEY=your_passkey
 FEE_AUTHORITY=your_fee_authority_public_key
+SOLANA_RPC=your_solana_rpc_endpoint
+GATE_TOKEN_MINT=your_token_mint_address_for_gating
 ```
 
 You can copy from the example file:
@@ -133,6 +162,21 @@ You can copy from the example file:
 cd BackEnd
 cp env.example .env
 # Then edit .env with your actual values
+```
+
+### Frontend Environment Variables
+
+Create a `.env.local` file in the `FrontEnd` directory:
+
+```env
+NEXT_PUBLIC_GATE_TOKEN_MINT=your_token_mint_address_for_gating
+```
+
+You can copy from the example file:
+```bash
+cd FrontEnd
+cp .env.example .env.local
+# Then edit .env.local with your actual token mint address
 ```
 
 ### Frontend Configuration

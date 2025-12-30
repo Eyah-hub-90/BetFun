@@ -189,7 +189,7 @@ export default function Home() {
                 User One
               </div>
               {/* <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
-                @speculapeuser
+                @betfunuser
               </div> */}
             </div>
             <div className="flex-1 h-[100px] flex justify-end items-center gap-1">

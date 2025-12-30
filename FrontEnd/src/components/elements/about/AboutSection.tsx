@@ -7,23 +7,23 @@ interface AboutSectionProps {
 
 const aboutAnswers = [
   {
-    title: "What is Speculape?",
+    title: "What is BetFun?",
     content: [
-      "Speculape is a decentralized prediction market platform where users can forecast outcomes on real-world events—such as sports, crypto, politics, and more—and earn rewards for accurate predictions. It leverages blockchain technology for transparency, security, and community-driven markets.",
-      "Unlike traditional betting or centralized prediction sites, Speculape empowers its community to create, participate in, and resolve markets. This means anyone can propose a new event, and the wisdom of the crowd determines the odds and outcomes. Our platform is designed to be accessible, intuitive, and open to everyone, regardless of experience level.",
+      "BetFun is a decentralized prediction market platform where users can forecast outcomes on real-world events—such as sports, crypto, politics, and more—and earn rewards for accurate predictions. It leverages blockchain technology for transparency, security, and community-driven markets.",
+      "Unlike traditional betting or centralized prediction sites, BetFun empowers its community to create, participate in, and resolve markets. This means anyone can propose a new event, and the wisdom of the crowd determines the odds and outcomes. Our platform is designed to be accessible, intuitive, and open to everyone, regardless of experience level.",
     ],
   },
   {
     title: "How do prediction markets work?",
     content: [
       "Prediction markets allow users to buy and sell shares in the outcome of future events. If your prediction is correct, you earn a payout. Prices reflect the collective wisdom of the market, and all trades are recorded on-chain for transparency and fairness.",
-      "On Speculape, each market has a YES and NO side. As users buy shares, the price adjusts to reflect the perceived probability of each outcome. This dynamic pricing means the market odds are always up-to-date, and you can buy or sell your position at any time before the event resolves. All settlements are handled automatically by smart contracts.",
+      "On BetFun, each market has a YES and NO side. As users buy shares, the price adjusts to reflect the perceived probability of each outcome. This dynamic pricing means the market odds are always up-to-date, and you can buy or sell your position at any time before the event resolves. All settlements are handled automatically by smart contracts.",
     ],
   },
   {
-    title: "Is Speculape safe and secure?",
+    title: "Is BetFun safe and secure?",
     content: [
-      "Yes. Speculape uses blockchain and smart contracts to ensure all trades are transparent, tamper-proof, and automated. User funds are protected by decentralized protocols, and all market outcomes are resolved fairly and openly.",
+      "Yes. BetFun uses blockchain and smart contracts to ensure all trades are transparent, tamper-proof, and automated. User funds are protected by decentralized protocols, and all market outcomes are resolved fairly and openly.",
       "We never take custody of your funds—everything is managed by secure, audited smart contracts. Our code is open source, and all transactions are visible on the blockchain. We also have robust dispute resolution and community governance to ensure markets are fair and trustworthy.",
     ],
   },
@@ -35,16 +35,16 @@ const aboutAnswers = [
     ],
   },
   {
-    title: "What can I predict on Speculape?",
+    title: "What can I predict on BetFun?",
     content: [
       "You can predict on a wide range of topics, including sports results, cryptocurrency prices, political events, entertainment, and more. New markets are added regularly, and you can even propose your own event for the community to trade on.",
-      "Our platform is constantly evolving, with trending and custom markets created by users like you. Whether you want to forecast the outcome of a major election, the next big crypto move, or the winner of a global sports event, Speculape has a market for you. We encourage creativity and diversity in market creation.",
+      "Our platform is constantly evolving, with trending and custom markets created by users like you. Whether you want to forecast the outcome of a major election, the next big crypto move, or the winner of a global sports event, BetFun has a market for you. We encourage creativity and diversity in market creation.",
     ],
   },
   {
-    title: "How does Speculape make money?",
+    title: "How does BetFun make money?",
     content: [
-      "Speculape charges a small fee on trades and market settlements. This fee helps maintain the platform, incentivize liquidity, and fund ongoing development. All fees are transparently displayed and kept as low as possible for users.",
+      "BetFun charges a small fee on trades and market settlements. This fee helps maintain the platform, incentivize liquidity, and fund ongoing development. All fees are transparently displayed and kept as low as possible for users.",
       "We believe in transparency and fairness. Our fee structure is simple and competitive, with no hidden costs. A portion of the fees is reinvested into platform improvements, community rewards, and security audits to ensure the best possible experience for all users.",
     ],
   },

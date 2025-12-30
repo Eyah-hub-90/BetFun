@@ -1,5 +1,5 @@
 {
-  "name": "prediction-market-backend",
+  "name": "betfun-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "url": "https://github.com/BlackSky-Jose/Prediction-market-SOLANA/issues"
   },
   "homepage": "https://github.com/BlackSky-Jose/Prediction-market-SOLANA#readme",
-  "description": "Backend service for Solana Prediction Market",
+  "description": "Backend service for BetFun - A Solana Prediction Market",
   "dependencies": {
     "@coral-xyz/anchor": "^0.29.0",
     "@mercurial-finance/vault-sdk": "^2.2.1",

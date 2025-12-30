@@ -48,6 +48,15 @@ export const initialSettings = {
   decimal: 9,
   fundFeePercentage: 1.5,
   bettingFeePercentage: 2.5
+}
+
+export const tokenGateConfig = {
+  enabled: true,
+  // Token mint address for the gate token (replace with actual mint address)
+  // Example: "BETFuN1234567890abcdefghijklmnopqrstuvwxyz"
+  tokenMintAddress: process.env.GATE_TOKEN_MINT || "11111111111111111111111111111111",
+  minimumBalance: 500000, // 500,000 tokens required to create markets
+  decimals: 6, // Token decimals (adjust based on your token)
 } 
 
 export const marketField = [

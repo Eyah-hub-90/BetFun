@@ -22,12 +22,12 @@ const SidebarItem: React.FC<{ title: string; isActive: boolean; onClick: () => v
 
 const AboutSubSidebar: React.FC<AboutSubSidebarProps> = ({ selectedIndex, setSelectedIndex }) => {
   const items = [
-    "What is Speculape?",
+    "What is BetFun?",
     "How do prediction markets work?",
-    "Is Speculape safe and secure?",
+    "Is BetFun safe and secure?",
     "How do I participate?",
-    "What can I predict on Speculape?",
-    "How does Speculape make money?",
+    "What can I predict on BetFun?",
+    "How does BetFun make money?",
   ];
 
   return (

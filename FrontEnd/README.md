@@ -1,6 +1,6 @@
-# Prediction Market Frontend
+# BetFun Frontend
 
-This is the frontend application for the Solana Prediction Market, built with Next.js 15, React 19, and TailwindCSS 4.0.
+This is the frontend application for BetFun - A Decentralized Prediction Market on Solana, built with Next.js 15, React 19, and TailwindCSS 4.0.
 
 ## Features
 

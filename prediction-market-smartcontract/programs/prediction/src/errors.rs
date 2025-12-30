@@ -27,4 +27,6 @@ pub enum ContractError {
     MarketNotActive,
     #[msg("Invalid Admin")]
     InvalidAdmin,
+    #[msg("Betting deadline exceeded - bets must be placed at least 48 hours before resolution")]
+    BettingDeadlineExceeded,
 }

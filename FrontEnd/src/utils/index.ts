@@ -1,4 +1,5 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
+import { getAccount, getAssociatedTokenAddress } from "@solana/spl-token";
 import axios from "axios";
 
 const PINATA_API_KEY = "6ab09644822193eed05d";
@@ -125,4 +126,58 @@ export function timeAgo(ms: number): string {
 
 export function stylizeFloat(num: number) {
   parseFloat(Number(num).toFixed(9)).toString()
+}
+
+// Token Gate Configuration
+export const TOKEN_GATE_CONFIG = {
+  enabled: true,
+  tokenMintAddress: process.env.NEXT_PUBLIC_GATE_TOKEN_MINT || "11111111111111111111111111111111",
+  minimumBalance: 500000,
+  decimals: 6,
+};
+
+/**
+ * Check if a wallet has the required token balance to create markets
+ */
+export async function checkTokenBalance(
+  walletAddress: string,
+  connection: Connection
+): Promise<{ hasAccess: boolean; balance: number; required: number }> {
+  try {
+    if (!TOKEN_GATE_CONFIG.enabled) {
+      return { hasAccess: true, balance: 0, required: 0 };
+    }
+
+    const walletPubkey = new PublicKey(walletAddress);
+    const tokenMintPubkey = new PublicKey(TOKEN_GATE_CONFIG.tokenMintAddress);
+
+    const associatedTokenAddress = await getAssociatedTokenAddress(
+      tokenMintPubkey,
+      walletPubkey
+    );
+
+    try {
+      const tokenAccount = await getAccount(connection, associatedTokenAddress);
+      const balance = Number(tokenAccount.amount) / Math.pow(10, TOKEN_GATE_CONFIG.decimals);
+
+      return {
+        hasAccess: balance >= TOKEN_GATE_CONFIG.minimumBalance,
+        balance,
+        required: TOKEN_GATE_CONFIG.minimumBalance
+      };
+    } catch (error) {
+      return {
+        hasAccess: false,
+        balance: 0,
+        required: TOKEN_GATE_CONFIG.minimumBalance
+      };
+    }
+  } catch (error) {
+    console.error("Error checking token balance:", error);
+    return {
+      hasAccess: false,
+      balance: 0,
+      required: TOKEN_GATE_CONFIG.minimumBalance
+    };
+  }
 }
