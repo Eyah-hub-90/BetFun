@@ -1,3 +1,4 @@
+pub mod admin_resolve;
 pub mod betting;
 pub mod create_market;
 pub mod deposite_liquidity;

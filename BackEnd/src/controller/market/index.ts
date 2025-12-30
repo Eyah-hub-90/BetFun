@@ -260,4 +260,60 @@ export const getFilteredMarket = async (req:Request, res: Response) => {
     }
 }
 
+export const adminResolve = async (req: Request, res: Response) => {
+    try {
+        const { market_id, outcome, admin_wallet } = req.body;
+
+        // Validate inputs
+        if (!market_id || typeof outcome !== 'boolean') {
+            return res.status(400).json({
+                error: "Invalid request",
+                message: "market_id and outcome (boolean) are required"
+            });
+        }
+
+        // Verify admin wallet matches the expected admin
+        const expectedAdmin = process.env.ADMIN_WALLET || "";
+        if (admin_wallet && admin_wallet !== expectedAdmin) {
+            return res.status(403).json({
+                error: "Unauthorized",
+                message: "Only the admin can resolve markets"
+            });
+        }
+
+        console.log(`🎯 Resolving market ${market_id} with outcome: ${outcome ? 'YES' : 'NO'}`);
+
+        // Import the SDK function dynamically
+        const sdk = await import('../../prediction_market_sdk');
+        const result = await sdk.adminResolveMarket(market_id, outcome);
+
+        // Update market status in database
+        await MarketModel.findByIdAndUpdate(
+            market_id,
+            {
+                $set: {
+                    marketStatus: "RESOLVED",
+                    resolvedAt: new Date(),
+                    resolutionTx: result.txSignature,
+                }
+            }
+        );
+
+        console.log(`✅ Market ${market_id} resolved successfully`);
+
+        res.status(200).json({
+            success: true,
+            message: "Market resolved successfully",
+            txSignature: result.txSignature,
+            outcome: outcome ? "YES" : "NO",
+        });
+    } catch (error) {
+        console.error("😒 admin resolve error:", error);
+        res.status(500).json({
+            error: "Failed to resolve market",
+            message: error instanceof Error ? error.message : "Unknown error"
+        });
+    }
+};
+
 export const recentActivity = async (req:Request, res: Response) => {}

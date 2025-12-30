@@ -287,6 +287,62 @@ export const getOracleResult = async (params: OracleType) => {
   console.log("market info:", betting_result);
 }
 
+export const adminResolveMarket = async (marketId: string, outcome: boolean) => {
+  try {
+    console.log("🎯 Admin resolving market:", marketId);
+    console.log("🎯 Outcome:", outcome ? "YES wins" : "NO wins");
+
+    // Create the resolve_market instruction
+    const resolveInstruction = await program.methods
+      .resolveMarket({ outcome })
+      .accounts({
+        user: auth.publicKey,
+        market: new PublicKey(marketId),
+        global: globalPDA,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    // Create and send transaction
+    const latestBlockHash = await provider.connection.getLatestBlockhash(
+      provider.connection.commitment
+    );
+
+    const messageV0 = new TransactionMessage({
+      payerKey: auth.publicKey,
+      recentBlockhash: latestBlockHash.blockhash,
+      instructions: [resolveInstruction],
+    }).compileToV0Message();
+
+    const vtx = new VersionedTransaction(messageV0);
+    vtx.sign([auth.payer]);
+
+    const txSignature = await solConnection.sendTransaction(vtx);
+    console.log("🎯 Resolution transaction:", txSignature);
+
+    const confirmation = await solConnection.confirmTransaction(txSignature, 'finalized');
+    console.log("🎯 Transaction confirmed:", confirmation);
+
+    // Fetch updated market state
+    const marketInfo = await program.account.market.fetch(
+      new PublicKey(marketId),
+      "confirmed"
+    );
+
+    console.log("🎯 Market resolved successfully");
+    console.log("🎯 Final result:", marketInfo.result ? "YES" : "NO");
+
+    return {
+      success: true,
+      txSignature,
+      result: marketInfo.result,
+    };
+  } catch (error) {
+    console.error("❌ Error resolving market:", error);
+    throw error;
+  }
+};
+
 export const udpateFeed = async (feedKey: String) => {
   let queue = await getDefaultDevnetQueue("https://api.devnet.solana.com");
   const feedAccount = new PullFeed(queue.program, "4ZM78DGSfS8AtZ3UKGyfKN6vw7ZJSpRueYE6kPLbKsTK");

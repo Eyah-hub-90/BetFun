@@ -44,3 +44,10 @@ pub struct BettingEvent {
     pub token_a_price: u64,
     pub token_b_price: u64,
 }
+
+#[event]
+pub struct AdminResolutionEvent {
+    pub market: Pubkey,
+    pub admin: Pubkey,
+    pub outcome: bool,
+}

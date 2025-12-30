@@ -48,6 +48,62 @@ To disable token gating for testing, set `enabled: false` in both configurations
 
 ---
 
+## 👨‍💼 Admin-Only Market Resolution
+
+BetFun uses an **admin-only manual resolution system** instead of oracle-based resolution. Only the designated admin wallet can resolve markets.
+
+### How Admin Resolution Works
+
+1. **Admin Access** – Only the wallet specified in `ADMIN_WALLET` environment variable can resolve markets
+2. **Manual Decision** – Admin reviews the market outcome and manually resolves it as YES or NO
+3. **On-Chain Execution** – Resolution is recorded on Solana blockchain via smart contract
+4. **Database Update** – Market status is updated to "RESOLVED" with transaction signature
+
+### Using the Admin Panel
+
+1. **Navigate** to `/admin/resolve` on the frontend
+2. **Connect** your admin wallet (must match `ADMIN_WALLET` in backend `.env`)
+3. **View** all active markets that need resolution
+4. **Resolve** each market by clicking "Resolve as YES" or "Resolve as NO"
+5. **Confirm** the transaction in your wallet
+
+### Admin Resolution Endpoint
+
+**POST** `/api/market/resolve`
+
+**Request Body:**
+```json
+{
+  "market_id": "mongodb_market_id",
+  "outcome": true,  // true = YES wins, false = NO wins
+  "admin_wallet": "your_admin_wallet_address"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Market resolved successfully",
+  "txSignature": "solana_transaction_signature",
+  "outcome": "YES"
+}
+```
+
+### Required Environment Variables
+
+- `ADMIN_WALLET` (Backend) - The Solana wallet address authorized to resolve markets
+- Must match the admin wallet configured in the smart contract's global state
+
+### Security Notes
+
+- Only one admin wallet can resolve markets
+- All resolutions are recorded on-chain for transparency
+- Resolution transactions require the admin's signature
+- Unauthorized resolution attempts return 403 Forbidden
+
+---
+
 ## How it works
 
 You can reference the guide video here:
@@ -155,6 +211,7 @@ PASSKEY=your_passkey
 FEE_AUTHORITY=your_fee_authority_public_key
 SOLANA_RPC=your_solana_rpc_endpoint
 GATE_TOKEN_MINT=your_token_mint_address_for_gating
+ADMIN_WALLET=your_admin_wallet_address_for_resolution
 ```
 
 You can copy from the example file:

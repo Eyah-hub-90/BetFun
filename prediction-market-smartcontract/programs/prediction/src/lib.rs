@@ -7,8 +7,8 @@ pub mod states;
 pub mod utils;
 
 use instructions::{
-    betting::*, create_market::*, deposite_liquidity::*, get_oracle_res::*, init::*, token_mint::*,
-    withdraw::*,
+    admin_resolve::*, betting::*, create_market::*, deposite_liquidity::*, get_oracle_res::*,
+    init::*, token_mint::*,
 };
 use states::{
     global::GlobalParams,
@@ -43,6 +43,10 @@ pub mod prediction {
 
     pub fn mint_token(ctx: Context<TokenMint>, market_id: String) -> Result<()> {
         TokenMint::token_mint(ctx, market_id)
+    }
+
+    pub fn resolve_market(ctx: Context<AdminResolve>, params: AdminResolveParams) -> Result<()> {
+        admin_resolve(ctx, params)
     }
 
 }
