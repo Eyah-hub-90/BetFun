@@ -83,35 +83,53 @@ export default function ClaimPage() {
         wallet.publicKey
       );
 
-      // Check both token balances
+      // Check both token balances to determine which token user holds
+      let winningTokenMint: PublicKey | null = null;
+      let userTokenAccount: PublicKey | null = null;
+      let userBalance = 0;
+
       try {
         const tokenAccountAInfo = await connection.getAccountInfo(userTokenAccountA);
-        const tokenAccountBInfo = await connection.getAccountInfo(userTokenAccountB);
-
-        // Determine which token to claim with (user needs to have balance)
-        let winningTokenMint: PublicKey;
-        let userTokenAccount: PublicKey;
-
         if (tokenAccountAInfo) {
-          winningTokenMint = tokenA;
-          userTokenAccount = userTokenAccountA;
-        } else if (tokenAccountBInfo) {
-          winningTokenMint = tokenB;
-          userTokenAccount = userTokenAccountB;
-        } else {
-          warningAlert("You don't have any tokens from this market");
-          return;
+          const accountData = await connection.getTokenAccountBalance(userTokenAccountA);
+          if (accountData.value.uiAmount && accountData.value.uiAmount > 0) {
+            winningTokenMint = tokenA;
+            userTokenAccount = userTokenAccountA;
+            userBalance = accountData.value.uiAmount;
+          }
         }
-
-        // Note: In production, you'd call your backend SDK to create the transaction
-        // For now, we'll show a placeholder
-        infoAlert("Withdraw function ready - implement SDK call here");
-
-        successAlert("Claim prepared! (Implementation needed)");
       } catch (error) {
-        console.error("Error getting token accounts:", error);
-        errorAlert("Failed to get token account information");
+        console.log("No token A account or balance");
       }
+
+      // If no token A balance, try token B
+      if (!winningTokenMint) {
+        try {
+          const tokenAccountBInfo = await connection.getAccountInfo(userTokenAccountB);
+          if (tokenAccountBInfo) {
+            const accountData = await connection.getTokenAccountBalance(userTokenAccountB);
+            if (accountData.value.uiAmount && accountData.value.uiAmount > 0) {
+              winningTokenMint = tokenB;
+              userTokenAccount = userTokenAccountB;
+              userBalance = accountData.value.uiAmount;
+            }
+          }
+        } catch (error) {
+          console.log("No token B account or balance");
+        }
+      }
+
+      if (!winningTokenMint || !userTokenAccount || userBalance === 0) {
+        warningAlert("You don't have any tokens from this market");
+        setClaiming(null);
+        return;
+      }
+
+      console.log("User has", userBalance, "tokens to claim with");
+      infoAlert(`Found ${userBalance} tokens. Withdrawal ready after smart contract deployment!`);
+
+      // Once smart contract is deployed, this will create actual withdrawal transaction
+      successAlert(`Ready to claim with ${userBalance} tokens! Deploy smart contract to enable.`);
     } catch (error: any) {
       console.error("Error claiming winnings:", error);
       const errorMsg = error.response?.data?.message || "Failed to claim winnings";

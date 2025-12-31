@@ -7,9 +7,11 @@ const sidebarNavList = [
   { label: "Home", href: "/" },
   { label: "FundMarket", href: "/fund" },
   { label: "ProposeMarket", href: "/propose" },
+  { label: "ClaimWinnings", href: "/claim" },
   { label: "Referral", href: "/referral" },
   { label: "Profile", href: "/profile" },
   { label: "About", href: "/about" },
+  { label: "Admin", href: "/admin/resolve" },
 ] as const;
 
 const SidebarNav: React.FC<SidebarNavProps> = ({ isCollapsed }) => {

@@ -47,10 +47,12 @@ const MarketSchema = new mongoose.Schema({
                 investor: { type: String, required: true },
                 amount: { type: Number, required: true }
             }
-        ], 
-        default: [] 
+        ],
+        default: []
     },
-    createdAt: { type: String, default: Date.now() }
+    createdAt: { type: String, default: Date.now() },
+    resolvedAt: { type: Date, default: null },
+    resolutionTx: { type: String, default: "" }
 });
 
 const MarketModel = mongoose.model("market", MarketSchema);
